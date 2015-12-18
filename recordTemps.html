@@ -9,20 +9,28 @@
 <body>
 <script>
 var stnId = "APA";
-var today = new Date();
+var tday = new Date();
+var today = new Date(tday.getTime() + 155*86400000);
 var dd = today.getDate();
 var mm = today.getMonth()+1; //January is 0!
 var yyyy = today.getFullYear();
+var lastyear = new Date(today.getTime() - 365*86400000);
+console.log(lastyear);
+var ldd = lastyear.getDate();
+var lmm = lastyear.getMonth()+1;
+var lyyyy= lastyear.getFullYear();
 
-var firstDate = new Date(yyyy,00,01);
-var lastDate = new Date(yyyy,today.getMonth(),dd);
+//var firstDate = new Date(yyyy,00,01);
+var firstDate = new Date(lyyyy,lmm,ldd);
+var lastDate = new Date(yyyy,mm,dd);
 
 var oneDay = 24*60*60*1000;
 
 var edate = yyyy+'-'+mm+'-'+dd;
-var sdate = yyyy+'-1-1';
+var sdate = lyyyy+'-1-1';
 
 $(getMaxDays);
+$(getRecordMaxDays);
 
 function postError() {
     alert("oops, error");
@@ -58,8 +66,23 @@ function getData(url, params) {
 
 function getMaxDays(){
 	var url='http://data.rcc-acis.org/StnData';
-	var params = {"sid":stnId,"sdate":sdate,"edate":edate,"elems":"gdd"};
+	var params = {"elems":[{"name":"maxt"},{"name":"mint"},
+                     {"name":"maxt","duration":"dly","normal":"1","prec":1},
+                     {"name":"mint","duration":"dly","normal":"1","prec":1}],
+                      "sid":"DENthr 9","sDate":"2015-01-01","eDate":"2015-12-31"
+                     }
 	getData(url,params);
+}
+
+function getRecordMaxDays(){
+        var url='http://data.rcc-acis.org/StnData';
+        var params= {"elems":[{"name":"maxt","interval":"dly","duration":"dly",
+                     "smry":{"reduce":"max","add":"date"},"smry_only":1,
+                     "groupby":["year","01-01","12-31"]},{"name":"mint","interval":"dly","duration":"dly","smry"
+                     :{"reduce":"min","add":"date"},"smry_only":1,"groupby":["year","01-01","12-31"]}],"sid":"DENthr 9","sDate":"por"
+                     ,"eDate":"por","meta":["name","state","valid_daterange","sids"]}
+                     //,"meta":["name","state","valid_daterange","sids"]}
+        getData(url,params);
 }
 
 function processResult(data){
@@ -145,7 +168,7 @@ function processResult(data){
                 series:[{
                         name: 'Growing Degree Days',
                         color: '#0404B4',
-                        type: 'column',
+                        type: 'line',
                         data: gdd,
                         pointStart: Date.UTC(yyyy,00,01),
                         pointInterval: 24 * 3600 * 1000

@@ -30,7 +30,7 @@ var edate = yyyy+'-'+mm+'-'+dd;
 var sdate = lyyyy+'-1-1';
 
 $(getMaxDays);
-$(getRecordMaxDays);
+//$(getRecordMaxDays);
 
 function postError() {
     alert("oops, error");
@@ -79,7 +79,7 @@ function getRecordMaxDays(){
         var params= {"elems":[{"name":"maxt","interval":"dly","duration":"dly",
                      "smry":{"reduce":"max","add":"date"},"smry_only":1,
                      "groupby":["year","01-01","12-31"]},{"name":"mint","interval":"dly","duration":"dly","smry"
-                     :{"reduce":"min","add":"date"},"smry_only":1,"groupby":["year","01-01","12-31"]}],"sid":"DENthr 9","sDate":"por"
+                     :{"reduce":"min","add":"date"},"smry_only":1,"groupby":["year","01-01","12-31"]}],"sid":"HOU","sDate":"por"
                      ,"eDate":"por","meta":["name","state","valid_daterange","sids"]}
                      //,"meta":["name","state","valid_daterange","sids"]}
         getData(url,params);
@@ -91,11 +91,17 @@ function processResult(data){
 	}
         else {
 	var sum = new Array();
-	var titleName = "Growing Degree Days (Base 50\u00B0F)";
+        var minT = new Array();
+        var minTave = new Array();
+	var titleName = "Daily Max and Min Temperatures"
 	var gdd = new Array();
 	for(var i=0;i<data.data.length;i++){
 		if(data.data[i][1] === "M"){gdd[i] = null;} //if the data is missing it will not show the data value.  
 		else{gdd[i] = parseInt(data.data[i][1],10);}
+		if(data.data[i][2] === "M"){minT[i] = null;} //if the data is missing it will not show the data value.  
+		else{minT[i] = parseInt(data.data[i][2],10);}
+		if(data.data[i][4] === "M"){minTave[i] = null;} //if the data is missing it will not show the data value.  
+		else{minTave[i] = parseInt(data.data[i][4],10);}
 		if(i==0){sum[i] = gdd[i];}
 		else{sum[i] = sum[i-1] + gdd[i];}
 	}
@@ -124,7 +130,7 @@ function processResult(data){
                 },
                 yAxis:[{
                 	title:{
-                        	text: 'Growing Degree Days',
+                        	text: 'Temperature Data',
                                 style: {
                         	        fontSize: '14px'
                                },
@@ -136,7 +142,7 @@ function processResult(data){
                         }
                	},{
                         title:{
-                        	text: 'Accumulated Growing Degree Days',
+                        	text: ' Temperatures ',
                                 style: {
                                 	color: '#F00000',
                                 	fontSize: '14px'
@@ -156,7 +162,7 @@ function processResult(data){
                 },
                 credits:{
                         text: 'Click and drag to zoom',
-                        href: 'http://www.rcc-acis.org/'
+                        //href: 'http://www.rcc-acis.org/'
                 },
                 plotOptions: {
                         series: {
@@ -166,18 +172,26 @@ function processResult(data){
                         }
                 },
                 series:[{
-                        name: 'Growing Degree Days',
-                        color: '#0404B4',
+                        name: 'Maximum Daily Temperature',
+                        color: '#F00000',
                         type: 'line',
                         data: gdd,
                         pointStart: Date.UTC(yyyy,00,01),
                         pointInterval: 24 * 3600 * 1000
                 },{
-                        name: 'Accumulated Growing Degree Days',
-                        color: '#F00000',
+                        name: 'Minimum Daily Temperature',
+                        color: '#0404B4',
                         yAxis: 1,
                         type: 'line',
-                        data: sum,
+                        data: minT,
+                        pointStart: Date.UTC(yyyy,00,01),
+                        pointInterval: 24 * 3600 * 1000
+                },{
+                        name: 'Min Average Temp',
+                        color: '#0704B4',
+                        yAxis: 1,
+                        type: 'line',
+                        data: minTave,
                         pointStart: Date.UTC(yyyy,00,01),
                         pointInterval: 24 * 3600 * 1000
                 }]

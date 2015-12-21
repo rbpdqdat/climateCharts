@@ -8,7 +8,8 @@
 </head>
 <body>
 <script>
-var stnId = "APA";
+var stnId = "DEN";
+stnId.concat("thr 9");
 var tday = new Date();
 var today = new Date(tday.getTime() + 155*86400000);
 var dd = today.getDate();
@@ -83,7 +84,7 @@ function getMaxDays(){
 	var params = {"elems":[{"name":"maxt"},{"name":"mint"},
                      {"name":"maxt","duration":"dly","normal":"1","prec":1},
                      {"name":"mint","duration":"dly","normal":"1","prec":1}],
-                     "sid":"LBBthr 9","sDate":"2015-01-01","eDate":"2015-12-31"}
+                     "sid":stnId,"sDate":"2015-01-01","eDate":"2015-12-31"}
 	getData(url,params);
 }
 
@@ -93,7 +94,7 @@ function getRecordMaxDays(){
                     {"reduce":"max","add":"date"},"smry_only":1,"groupby":
                               ["year","01-01","12-31"]},
                     {"name":"mint","interval":"dly","duration":"dly","smry":{"reduce":"min","add":"date"},
-                    "smry_only":1,"groupby":["year","01-01","12-31"]}],"sid":"LBBthr 9","sDate":"por"
+                    "smry_only":1,"groupby":["year","01-01","12-31"]}],"sid":stnId,"sDate":"por"
                     ,"eDate":"por","meta":["name","state","valid_daterange","sids"]}
         getRecordData(url,params);
 }
@@ -116,7 +117,6 @@ function processRecords(data) {
             }
         }
         }
-    console.log(recordminT);
     $(getMaxDays);
 }
 
@@ -167,34 +167,26 @@ function processResult(data){
                                 }
                         }
                 },
-                yAxis:[{
+                yAxis:{
                 	title:{
-                        	text: 'Temperature Data',
+                        	text: 'Temperatures Data (°F)',
                                 style: {
                         	        fontSize: '14px'
                                },
                         },
+                        endOnTick:false,
                         labels: {
                         	style: {
                                 	color: '#000000'
                                 }
-                        }
-               	},{
-                        title:{
-                        	text: ' Temperatures ',
-                                style: {
-                                	color: '#F00000',
-                                	fontSize: '14px'
-                                },
                         },
-                        labels: {
-				style: {
-                                color: '#000000'
-                        }
+                        min: recordminT.reduce(function(prev, curr) {
+                               return prev < curr ? prev : curr;
+                             }),
+                        max: recordmaxT.reduce(function(prev, curr) {
+                               return prev > curr ? prev : curr;
+                             }),
                 },
-                        min: 0,
-                        opposite: true
-                }],
                 tooltip:{
                         shared: true,
                         crosshairs: true
@@ -214,14 +206,12 @@ function processResult(data){
                         name: 'Maximum Daily Temperature',
                         color: '#F00000',
                         type: 'line',
-                        yAxis: 1,
                         data: maxT,
                         pointStart: Date.UTC(yyyy,00,01),
                         pointInterval: 24 * 3600 * 1000
                 },{
                         name: 'Minimum Daily Temperature',
                         color: '#0404B4',
-                        yAxis: 1,
                         type: 'line',
                         data: minT,
                         pointStart: Date.UTC(yyyy,00,01),
@@ -229,7 +219,6 @@ function processResult(data){
                 },{
                         name: 'Min Average Temp',
                         color: '#0704B4',
-                        yAxis: 1,
                         type: 'spline',
                         dashStyle: 'Dot',
                         data: minTave,
@@ -238,7 +227,6 @@ function processResult(data){
                 },{
                         name: 'Max Ave Temperature',
                         color: '#F11111',
-                        yAxis: 1,
                         type: 'spline',
                         dashStyle: 'Dot',
                         data: maxTave,
@@ -247,7 +235,6 @@ function processResult(data){
                 },{
                         name: 'Record Max Temperature',
                         color: '#F55555',
-                        yAxis: 1,
                         type: 'spline',
                         dashStyle: 'Dot',
                         data: recordmaxT,
@@ -256,7 +243,6 @@ function processResult(data){
                 },{
                         name: 'Record Min Temperature',
                         color: '#BBBBBB',
-                        yAxis: 1,
                         type: 'spline',
                         dashStyle: 'Dot',
                         data: recordminT,
@@ -272,3 +258,4 @@ function processResult(data){
 <div id="output" style="width:800px;height:500px"></div>
 </body>
 </html>
+

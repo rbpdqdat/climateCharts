@@ -28,9 +28,10 @@ var oneDay = 24*60*60*1000;
 
 var edate = yyyy+'-'+mm+'-'+dd;
 var sdate = lyyyy+'-1-1';
+var recordminT = new Array();
+var recordmaxT = new Array();
 
-$(getMaxDays);
-//$(getRecordMaxDays);
+$(getRecordMaxDays);
 
 function postError() {
     alert("oops, error");
@@ -64,46 +65,84 @@ function getData(url, params) {
     }
 }
 
+function getRecordData(url, params) {
+    var xdr, args, results,
+        params_string = JSON.stringify(params);
+        args = {params: params_string};
+        $.ajax(url, {
+            type: 'POST',
+            data: args,
+            crossDomain: true,
+            success: processRecords,
+            error: postError
+        });
+}
+
 function getMaxDays(){
 	var url='http://data.rcc-acis.org/StnData';
 	var params = {"elems":[{"name":"maxt"},{"name":"mint"},
                      {"name":"maxt","duration":"dly","normal":"1","prec":1},
                      {"name":"mint","duration":"dly","normal":"1","prec":1}],
-                      "sid":"DENthr 9","sDate":"2015-01-01","eDate":"2015-12-31"
-                     }
+                     "sid":"LBBthr 9","sDate":"2015-01-01","eDate":"2015-12-31"}
 	getData(url,params);
 }
 
 function getRecordMaxDays(){
         var url='http://data.rcc-acis.org/StnData';
-        var params= {"elems":[{"name":"maxt","interval":"dly","duration":"dly",
-                     "smry":{"reduce":"max","add":"date"},"smry_only":1,
-                     "groupby":["year","01-01","12-31"]},{"name":"mint","interval":"dly","duration":"dly","smry"
-                     :{"reduce":"min","add":"date"},"smry_only":1,"groupby":["year","01-01","12-31"]}],"sid":"HOU","sDate":"por"
-                     ,"eDate":"por","meta":["name","state","valid_daterange","sids"]}
-                     //,"meta":["name","state","valid_daterange","sids"]}
-        getData(url,params);
+        var params= {"elems":[{"name":"maxt","interval":"dly","duration":"dly","smry":
+                    {"reduce":"max","add":"date"},"smry_only":1,"groupby":
+                              ["year","01-01","12-31"]},
+                    {"name":"mint","interval":"dly","duration":"dly","smry":{"reduce":"min","add":"date"},
+                    "smry_only":1,"groupby":["year","01-01","12-31"]}],"sid":"LBBthr 9","sDate":"por"
+                    ,"eDate":"por","meta":["name","state","valid_daterange","sids"]}
+        getRecordData(url,params);
 }
+
+function processRecords(data) {
+        if (typeof data.smry == 'undefined') {
+                alert('Station is invalid or has no data.  Try another station (eg. HOU).');
+        }
+        else {
+        //var sum = new Array();
+        for(var i=0;i<data.smry.length;i++){
+            for (var j=0;j<data.smry[i].length;j++){
+               if (i== 0) {
+                  if(data.smry[i][j] === "M"){recordmaxT[i] = null;} //if the data is missing it will not show the data value.
+                  else{recordmaxT[j] = parseInt(data.smry[i][j],10);}
+               } else {
+                  if(data.smry[i][j] === "M"){recordminT[i] = null;} //if the data is missing it will not show the data value.
+                  else{recordminT[j] = parseInt(data.smry[i][j],10);}
+              }
+            }
+        }
+        }
+    console.log(recordminT);
+    $(getMaxDays);
+}
+
 
 function processResult(data){
         if (typeof data.data == 'undefined') { 
 		alert('Station is invalid or has no data.  Try another station (eg. HOU).');
 	}
         else {
-	var sum = new Array();
+	//var sum = new Array();
         var minT = new Array();
         var minTave = new Array();
 	var titleName = "Daily Max and Min Temperatures"
-	var gdd = new Array();
+	var maxT = new Array();
+        var maxTave = new Array();
 	for(var i=0;i<data.data.length;i++){
-		if(data.data[i][1] === "M"){gdd[i] = null;} //if the data is missing it will not show the data value.  
-		else{gdd[i] = parseInt(data.data[i][1],10);}
+		if(data.data[i][1] === "M"){maxT[i] = null;} //if the data is missing it will not show the data value.  
+		else{maxT[i] = parseInt(data.data[i][1],10);}
 		if(data.data[i][2] === "M"){minT[i] = null;} //if the data is missing it will not show the data value.  
 		else{minT[i] = parseInt(data.data[i][2],10);}
+		if(data.data[i][3] === "M"){maxTave[i] = null;} //if the data is missing it will not show the data value.  
+		else{maxTave[i] = parseFloat(data.data[i][3],10);}
 		if(data.data[i][4] === "M"){minTave[i] = null;} //if the data is missing it will not show the data value.  
-		else{minTave[i] = parseInt(data.data[i][4],10);}
-		if(i==0){sum[i] = gdd[i];}
-		else{sum[i] = sum[i-1] + gdd[i];}
+		else{minTave[i] = parseFloat(data.data[i][4],10);}
+	//	if(i==0){sum[i] = gdd[i];}
+	//	else{sum[i] = sum[i-1] + gdd[i];}
 	}
 	$('#output').highcharts({
 		chart:{
@@ -175,7 +214,8 @@ function processResult(data){
                         name: 'Maximum Daily Temperature',
                         color: '#F00000',
                         type: 'line',
-                        data: gdd,
+                        yAxis: 1,
+                        data: maxT,
                         pointStart: Date.UTC(yyyy,00,01),
                         pointInterval: 24 * 3600 * 1000
                 },{
@@ -190,8 +230,36 @@ function processResult(data){
                         name: 'Min Average Temp',
                         color: '#0704B4',
                         yAxis: 1,
-                        type: 'line',
+                        type: 'spline',
+                        dashStyle: 'Dot',
                         data: minTave,
+                        pointStart: Date.UTC(yyyy,00,01),
+                        pointInterval: 24 * 3600 * 1000
+                },{
+                        name: 'Max Ave Temperature',
+                        color: '#F11111',
+                        yAxis: 1,
+                        type: 'spline',
+                        dashStyle: 'Dot',
+                        data: maxTave,
+                        pointStart: Date.UTC(yyyy,00,01),
+                        pointInterval: 24 * 3600 * 1000
+                },{
+                        name: 'Record Max Temperature',
+                        color: '#F55555',
+                        yAxis: 1,
+                        type: 'spline',
+                        dashStyle: 'Dot',
+                        data: recordmaxT,
+                        pointStart: Date.UTC(yyyy,00,01),
+                        pointInterval: 24 * 3600 * 1000
+                },{
+                        name: 'Record Min Temperature',
+                        color: '#BBBBBB',
+                        yAxis: 1,
+                        type: 'spline',
+                        dashStyle: 'Dot',
+                        data: recordminT,
                         pointStart: Date.UTC(yyyy,00,01),
                         pointInterval: 24 * 3600 * 1000
                 }]

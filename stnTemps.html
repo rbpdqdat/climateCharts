@@ -1,0 +1,45 @@
+<html>
+<head>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css">
+    <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+    <link rel="stylesheet" type="text/css" href="qstyle.css"/>
+    <script src="//code.jquery.com/ui/1.11.1/jquery-ui.js"></script>
+    <script src="http://code.highcharts.com/highcharts.js"></script>
+    <script src="http://code.highcharts.com/modules/exporting.js"></script>
+    <script src="q_ajaxform.js"></script>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+</head>
+<body>
+   <h2>Weather Temperature Data</h2>
+     <div>
+     <h3>The City Name/Airport and Date are required before submit. </h3>
+     <form name='climindex-form' id='climindex-form' action=#>
+      <fieldset>
+           <div class="ui-widget">
+               <label for="cityname">City/Wx Station: </label>
+               <input id="cityname" placeholder="Weather Station" required name="cityname">
+               <input type="hidden" id="stnid" name="stnid">
+           </div>
+       <!--
+       <input type="text" id="stnid" name="stnid" placeholder="Station ID (i.e. KDEN)" required maxlength="4" class="txtinput">
+       -->
+       <div id="timeselect">
+          <label for="from">Choose Date:</label>
+          <input class="ui-selectmenu-button ui-widget ui-state-default ui-corner-all" required type="text" id="from" name="from" class="txtinput">
+        </div>
+         </fieldset>
+          <div class="buttonorg">
+            <input type="submit" name="button1" id="button1" value="Submit">
+            <input type="reset" value="Reset!">
+          </div>
+          </form>
+      </div>
+<!--
+<div id="output" style="width:800px;height:500px"></div>
+-->
+  <script src="http://code.highcharts.com/highcharts.js"></script>
+  <script src="http://code.highcharts.com/modules/exporting.js"></script>
+  <div id="container" style="min-width: 400px; height: 400px; margin: 0 auto"></div>
+</body>
+</html>
+

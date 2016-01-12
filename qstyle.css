@@ -1,0 +1,85 @@
+body {
+  margin:0;
+  padding:0;
+}
+input[type="text"] {
+  width:180px;
+  margin:5px;
+  display:inline;
+}
+input[type="number"] {
+  margin:5px;
+}
+#cityname {
+  width:400px;
+}
+#from {
+  width:150px;
+}
+fieldset {
+width: 70%;
+white-space:nowrap;
+}
+.ui-widget-content {
+style: border:0;
+}
+input[type="number"] {
+  width:70px;
+}
+label {
+  display:block;
+  font-weight:bold;
+  margin:3px;
+}
+h1 {
+  margin: 35px 0 0 90px;
+  font-size: 4em;
+  font-weight: bold;
+  color: #5a3811; 
+  padding: 8px;
+}
+div {
+  margin: 5px;
+}
+h2 {
+  padding: 10px;
+}
+
+#climindex-form .txtinput {
+    border-color: #dedede;
+    border-style: solid;
+    border-width: 1px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) inset;
+    color: #777;
+    font-family: "Helvetica Neue",Arial,sans-serif;
+    font-size: 1em;
+    margin-bottom: 10px;
+    margin-left: 20px;
+    margin-top: 10px;
+    padding: 11px 10px 11px 15px;
+    transition: border 0.15s linear 0s, box-shadow 0.15s linear 0s, color 0.15s linear 0s;
+    width: 28%;
+}
+#climindex-form .txtinput:focus {
+    border-color: rgba(41, 92, 161, 0.4);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) inset, 0 0 8px rgba(41, 92, 161, 0.6);
+    color: #333;
+    outline: 0 none;
+}
+#climindex-form .submit:hover {
+    cursor: pointer;
+    opacity: 0.85;
+}
+#climindex-form .submit:active {
+    border: 1px solid #20911e;
+    box-shadow: 0 0 10px 5px #356b0b inset;
+    padding: 10px;
+}
+#climindex-form input:invalid {
+    border: 2px solid red;
+    border-radius: 4px;
+}
+#climindex-form input:valid {
+    border: 2px solid green;
+    border-radius: 4px;
+}

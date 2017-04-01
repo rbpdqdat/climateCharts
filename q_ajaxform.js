@@ -3,7 +3,47 @@
 //var stnId = "DCAthr 9";
 var stnId = "";
 //stnId.concat("thr 9");
-var tday = new Date();
+$(function() {
+   $( "#from" ).datepicker({
+    // defaultDate: "-1m",
+     changeMonth: true,
+     numberOfMonths: 1,
+     changeYear: true,
+     dateFormat: "yy-mm-dd",
+     yearRange: "-120:+0",
+     inline:true,
+     cache: false,
+     onClose: function( selectedDate ) {
+     tday = $(this).datepicker('getDate');
+     today = new Date(tday.getTime() + 155*86400000);
+     dd = today.getDate();
+     mm = today.getMonth(); //January is 0!
+     yyyy = today.getFullYear(); 
+     lastyear = new Date(tday.getTime() - 155*86400000);
+     ldd = lastyear.getDate();
+     lmm = lastyear.getMonth();
+     lyyyy= lastyear.getFullYear();
+//var firstDate = new Date(yyyy,00,01);
+//var firstDate = new Date(lyyyy,lmm,ldd);
+     firstDate = lastyear
+//var lastDate = new Date(yyyy,mm,dd);
+     lastDate = today
+console.log(firstDate);
+
+    edate = yyyy+'-'+mm+'-'+dd;
+    sdate = lyyyy+'-'+lmm+'-'+ldd;
+    recordminT = new Array();
+    recordmaxT = new Array();
+    reindexrMaxT = new Array();
+    reindexrMinT = new Array();
+    recordMaxD = new Array();
+    recordMinD = new Array();
+    reindexrMinTdate = new Array();
+    reindexrMaxTdate = new Array();
+     }
+   });
+});
+/*var tday = new Date();
 var today = new Date(tday.getTime() + 155*86400000);
 var dd = today.getDate();
 var mm = today.getMonth(); //January is 0!
@@ -12,7 +52,6 @@ var lastyear = new Date(tday.getTime() - 155*86400000);
 var ldd = lastyear.getDate();
 var lmm = lastyear.getMonth();
 var lyyyy= lastyear.getFullYear();
-console.log(ldd,lmm,lyyyy)
 //var firstDate = new Date(yyyy,00,01);
 //var firstDate = new Date(lyyyy,lmm,ldd);
 var firstDate = lastyear
@@ -26,7 +65,11 @@ var recordminT = new Array();
 var recordmaxT = new Array();
 var reindexrMaxT = new Array();
 var reindexrMinT = new Array();
-
+var recordMaxD = new Array();
+var recordMinD = new Array();
+var reindexrMinTdate = new Array();
+var reindexrMaxTdate = new Array();
+*/
 Date.prototype.dayOfYear = function(){
     var j1= new Date(this);
     j1.setMonth(0, 0);
@@ -113,10 +156,11 @@ function processRecords(data) {
             for (var j=0;j<data.smry[i].length;j++){
                if (i== 0) {
                   if(data.smry[i][j] === "M"){recordmaxT[j] = null;} //if the data is missing it will not show the data value.
-                  else{recordmaxT[j] = parseInt(data.smry[i][j],10);}
+                  else{recordmaxT[j] = parseInt(data.smry[i][j],10);recordMaxD[j]=Date.parse(data.smry[i][j][1]);}
+                  //console.log(Date.parse(data.smry[i][j][1]).getFullYear())
                } else {
                   if(data.smry[i][j] === "M"){recordminT[j] = null;} //if the data is missing it will not show the data value.
-                  else{recordminT[j] = parseInt(data.smry[i][j],10);}
+                  else{recordminT[j] = parseInt(data.smry[i][j],10);recordMinD[j]=Date.parse(data.smry[i][j][1]);}
               }
             }
         }
@@ -124,7 +168,16 @@ function processRecords(data) {
     $(getMaxDays);
 }
 
+
+
+function leapYear(year)
+{
+  return ((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0);
+}
+
+
 function processResult(data){
+        $('#container').empty();
         if (typeof data.data == 'undefined') {
                 alert('Station is invalid or has no data.  Try another station (eg. HOU).');
         }
@@ -145,11 +198,17 @@ function processResult(data){
                 if(data.data[i][4] === "M"){minTave[i] = null;} //if the data is missing it will not show the data value.
                 else{minTave[i] = parseFloat(data.data[i][4],10);}
                 var tDate = (data.data[i][0]).split("-");
+                //var indexDate = new Date(tDate[0],tDate[1]-1,tDate[2])
                 var indexDate = new Date(tDate[0],tDate[1]-1,tDate[2])
-                var indexNum = indexDate.dayOfYear()
-                reindexrMinT[i]=recordminT[indexNum]
+                var indexNum = indexDate.dayOfYear()-1
+                if ((!leapYear(tDate[0])) && (indexNum > 59)) {
+                   indexNum=indexNum+1
+                }
+                reindexrMinT[i]=recordminT[indexNum];
+                reindexrMaxTdate[i]=recordMaxD[indexNum];
                 reindexrMaxT[i]=recordmaxT[indexNum]
-                console.log(tDate,recordminT[indexNum],recordmaxT[indexNum])
+                reindexrMinTdate[i]=recordMinD[indexNum];
+                //console.log(tDate,recordminT[indexNum],recordmaxT[indexNum])
 
         //      if(i==0){sum[i] = gdd[i];}
         //      else{sum[i] = sum[i-1] + gdd[i];}
@@ -197,9 +256,29 @@ function processResult(data){
                                return prev > curr ? prev : curr;
                              }),
                 },
-                tooltip:{
-                        shared: true,
-                        crosshairs: true
+                tooltip: {
+                    shared: false,
+                    crosshairs: true,
+                    formatter: function() {
+                       var serie = this.series;
+                       //console.log(serie.options.recordMaxDate);
+                       //var j = serie.options.recordMaxDate[this.series.data.indexOf( this.point)]
+                       var j = this.series.data.indexOf( this.point );
+                       var s = '<b>' + Highcharts.dateFormat('%A, %b %e, %Y', this.x) + '</b><br>';
+                       s += '<br> Record Max T ' + Highcharts.dateFormat('%Y',reindexrMaxTdate[j]) + ': ' + reindexrMaxT[j] + '</br>';
+                       s += '<br> Daily Max T: ' + maxT[j] + '</br>';
+                       s += '<br> Daily Max T Ave: ' + maxTave[j] + '</br>';
+                       s += '<br> Daily Min T: ' + minT[j] + '</br>';
+                       s += '<br> Daily Min T Ave: ' + minTave[j] + '</br>';
+                       s += '<br> Record Min T '+ Highcharts.dateFormat('%Y',reindexrMinTdate[j]) +': '+reindexrMinT[j] + '</br><br></br>';
+                       //var s = '<b>' + Highcharts.dateFormat('%A, %b %e, %Y', this.x) + '</b><br>';
+                       //var s = '<b>' + j.getFullYear() + '</b>';//Highcharts.dateFormat('%A, %b %e, %Y', this.x) + '</b><br>';
+                       //s += '<span style="color:' + serie.color + '">' + serie.options.name + '</span>: <b>' + this.y + '</b><br/>';
+                       //$.each(serie.options.recordMaxDate, function() {
+                       //    var s = '<b>' + this.getFullYear() + '</b> ';
+                       //});
+                    return s;
+                    }
                 },
                 credits:{
                         text: 'Click and drag to zoom',
@@ -251,7 +330,7 @@ function processResult(data){
                         pointStart: Date.UTC(lyyyy,lmm-1,ldd),
                         pointInterval: 24 * 3600 * 1000
                 },{
-                        name: 'Record Min Temperature',
+                        name : ' Record Min Temperature',
                         color: '#BBBBBB',
                         type: 'spline',
                         dashStyle: 'Dot',
@@ -266,20 +345,6 @@ function processResult(data){
 }
 
 
-$(function() {
-   $( "#from" ).datepicker({
-    // defaultDate: "-1m",
-     changeMonth: true,
-     numberOfMonths: 1,
-     changeYear: true,
-     dateFormat: "yy-mm-dd",
-     yearRange: "-120:+0",
-     inline:true,
-     cache: false,
-     onClose: function( selectedDate ) {
-     }
-   });
-});
 
 $(function() {
     var stations = [{value:"KABQ",label:"ALBUQUERQUE International  Airport"},
@@ -317,6 +382,7 @@ $(function() {
 {value:"KDFW",label:"Dallas/Ft. Worth International  Airport"},
 {value:"KDHT",label:"Dalhart Municipal Airport"},
 {value:"KDLH",label:"Duluth, Duluth International Airport"},
+{value:"KEGE",label:"Eagle Co. Airport"},
 {value:"KDTW",label:"Detroit Metropolitan"},
 {value:"KEAU",label:"Eau Claire Chippawa Valley"},
 {value:"KFAR",label:"Hector International Airport"},
@@ -354,6 +420,7 @@ $(function() {
 {value:"KOMA",label:"Omaha Eppley Airport"},
 {value:"KORD",label:"Chicago OHare Airport"},
 {value:"KNKX",label:"Mcas Miramas"},
+{value:"KRIL",label:"Rifle/Garfiled Rgnl"},
 {value:"KSAC",label:"Sacramento AP"},
 {value:"KSEA",label:"Seattle Tacoma Airport"},
 {value:"KSLC",label:"Salt Lake City Intl Airport"},
@@ -373,7 +440,7 @@ $(function() {
               // $( "#stnid-id" ).val( ui.item.value );
               // $( "#stnid-description" ).html( ui.item.desc );
                stnId = ui.item.value;
-               console.log(stnId);
+               //console.log(stnId);
                return false;
             }
     })

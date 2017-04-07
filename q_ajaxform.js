@@ -126,7 +126,7 @@ function getRecordData(url, params) {
 }
 
 function getMaxDays(){
-        var url='http://data.rcc-acis.org/StnData';
+        var url='https://data.rcc-acis.org/StnData';
         var params = {"elems":[{"name":"maxt"},{"name":"mint"},
                      {"name":"maxt","duration":"dly","normal":"1","prec":1},
                      {"name":"mint","duration":"dly","normal":"1","prec":1}],
@@ -135,7 +135,7 @@ function getMaxDays(){
 }
 
 function getRecordMaxDays(){
-        var url='http://data.rcc-acis.org/StnData';
+        var url='https://data.rcc-acis.org/StnData';
         var params= {"elems":[{"name":"maxt","interval":"dly","duration":"dly","smry":
                     {"reduce":"max","add":"date"},"smry_only":1,"groupby":
                               ["year","01-01","12-31"]},
@@ -282,7 +282,7 @@ function processResult(data){
                 },
                 credits:{
                         text: 'Click and drag to zoom',
-                        //href: 'http://www.rcc-acis.org/'
+                        //href: 'https://www.rcc-acis.org/'
                 },
                 plotOptions: {
                         series: {

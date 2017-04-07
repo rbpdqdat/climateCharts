@@ -1,10 +1,10 @@
 <html>
 <head>
-    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css">
-    <script src="//code.jquery.com/jquery-1.10.2.js"></script>
-    <script src="//code.jquery.com/ui/1.11.1/jquery-ui.js"></script>
-    <script src="http://code.highcharts.com/highcharts.js"></script>
-    <script src="http://code.highcharts.com/modules/exporting.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+    <script src="https://code.jquery.com/ui/1.11.1/jquery-ui.js"></script>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 </head>
 <body>
@@ -89,7 +89,7 @@ function getRecordData(url, params) {
 }
 
 function getMaxDays(){
-	var url='http://data.rcc-acis.org/StnData';
+	var url='https://data.rcc-acis.org/StnData';
 	var params = {"elems":[{"name":"maxt"},{"name":"mint"},
                      {"name":"maxt","duration":"dly","normal":"1","prec":1},
                      {"name":"mint","duration":"dly","normal":"1","prec":1}],
@@ -98,7 +98,7 @@ function getMaxDays(){
 }
 
 function getRecordMaxDays(){
-        var url='http://data.rcc-acis.org/StnData';
+        var url='https://data.rcc-acis.org/StnData';
         var params= {"elems":[{"name":"maxt","interval":"dly","duration":"dly","smry":
                     {"reduce":"max","add":"date"},"smry_only":1,"groupby":
                               ["year","01-01","12-31"]},
@@ -210,7 +210,7 @@ function processResult(data){
                 },
                 credits:{
                         text: 'Click and drag to zoom',
-                        //href: 'http://www.rcc-acis.org/'
+                        //href: 'https://www.rcc-acis.org/'
                 },
                 plotOptions: {
                         series: {
